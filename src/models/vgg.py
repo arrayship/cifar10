@@ -22,9 +22,9 @@ class VGGConvBlock(nn.Module):
         for i, b in enumerate(self.blocks):
             self.add_module('B_' + str(i).zfill(3), b)
 
-class VGGFCBlock(nn.Module):
+class VGGClfBlock(nn.Module):
     def __init__(self, n_inpch, n_otp):
-        super(VGGFCBlock, self).__init__()
+        super(VGGClfBlock, self).__init__()
         self.blocks = []
         self.make_net(n_inpch, n_otp)
 
@@ -47,13 +47,10 @@ class VGGFCBlock(nn.Module):
             self.add_module('B_' + str(i).zfill(3), b)
 
 class VGG(nn.Module):
-    """
-    modified from torchvision vgg model
-    """
     def __init__(self, cfg, n_otp=10, init_weights=False):
         super(VGG, self).__init__()
         self.blocks = []
-        self.make_net(cfg, n_otp)
+        self.make_net(cfg['cfg'], n_otp, cfg['batch_norm'])
         if init_weights:
             self._initialize_weights()
 
@@ -85,9 +82,9 @@ class VGG(nn.Module):
     def make_conv(self, cfg, batch_norm=False):
         n_inpch = 3
         for c in cfg:
-            self.blocks.append(VGGConvBlock(n_inpch, c))
+            self.blocks.append(VGGConvBlock(n_inpch, c, batch_norm))
             n_inpch = c[- 1]
         return n_inpch
         
     def make_clf(self, n_inpch, n_otp):
-        self.blocks.append(VGGFCBlock(n_inpch, n_otp))
+        self.blocks.append(VGGClfBlock(n_inpch, n_otp))
