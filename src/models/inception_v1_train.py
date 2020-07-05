@@ -1,4 +1,5 @@
 from ignite.engine import Events, create_supervised_trainer, create_supervised_evaluator
+from ignite.metrics import Accuracy, Loss
 from ignite.utils import convert_tensor
 
 def train_net(net, opt, loss_fn, val_metrics, train_loader, val_loader, device):
@@ -15,20 +16,17 @@ def train_net(net, opt, loss_fn, val_metrics, train_loader, val_loader, device):
             prepare_batch=prepare_batch, output_transform=output_transform)
     evaluator = create_supervised_evaluator(net, val_metrics, device,
             prepare_batch=prepare_batch)
-    s = '{}: {:.2f} '
     @trainer.on(Events.EPOCH_COMPLETED)
     def log_training_results(trainer):
         evaluator.run(train_loader)
+        metrics = evaluator.state.metrics
         print('Epoch {}'.format(trainer.state.epoch))
-        message = 'Train - '
-        for m in val_metrics.keys():
-            message += s.format(m, evaluator.state.metrics[m])
-        print(message)
+        print('Train - Avg accuracy: {:.2f} Avg loss: {:.2f}'
+                .format(metrics['acc'], metrics['loss']))
     @trainer.on(Events.EPOCH_COMPLETED)
     def log_validation_results(trainer):
         evaluator.run(val_loader)
-        message = 'Val   - '
-        for m in val_metrics.keys():
-            message += s.format(m, evaluator.state.metrics[m])
-        print(message)
+        metrics = evaluator.state.metrics
+        print('Val   - Avg accuracy: {:.2f} Avg loss: {:.2f}'
+                .format(metrics['acc'], metrics['loss'])) 
     return trainer

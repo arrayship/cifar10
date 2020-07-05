@@ -138,9 +138,9 @@ class InV1ClfBlock(nn.Module):
         for i, b in enumerate(self.blocks):
             self.add_module('B_' + str(i).zfill(3), b)
 
-class InV1(nn.Module):
+class InceptionV1(nn.Module):
     def __init__(self, cfg, n_otp=10, init_weights=False):
-        super(InV1, self).__init__()
+        super(InceptionV1, self).__init__()
         self.blocks = []
         self.make_net(cfg, n_otp)
         if init_weights:
@@ -157,7 +157,7 @@ class InV1(nn.Module):
                 x = r['start'](x)
             elif 'incept' in r.keys():
                 x = r['incept'](x)
-        return otp
+        return torch.cat(otp, 1)
 
     def _initialize_weights(self):
         for m in self.modules():
