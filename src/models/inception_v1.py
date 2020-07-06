@@ -16,12 +16,15 @@ class InV1StartBlock(nn.Module):
         self.blocks.append(nn.Conv2d(n_inpch, 64,
                 kernel_size=7, stride=2, padding=3, bias=False))
         self.blocks.append(nn.BatchNorm2d(64, eps=0.001))
+        self.blocks.append(nn.ReLU(True))
         self.blocks.append(nn.MaxPool2d(3, stride=2, ceil_mode=True))
         self.blocks.append(nn.Conv2d(64, 64, kernel_size=1, bias=False))
         self.blocks.append(nn.BatchNorm2d(64, eps=0.001))
+        self.blocks.append(nn.ReLU(True))
         self.blocks.append(nn.Conv2d(64, 192,
                 kernel_size=3, padding=1, bias=False))
         self.blocks.append(nn.BatchNorm2d(192, eps=0.001))
+        self.blocks.append(nn.ReLU(True))
         self.blocks.append(nn.MaxPool2d(3, stride=2, ceil_mode=True))
         for i, b in enumerate(self.blocks):
             self.add_module('B_' + str(i).zfill(3), b)
@@ -44,10 +47,12 @@ class InV1InConvBlock(nn.Module):
         if n_redch:
             self.blocks.append(nn.Conv2d(n_inpch, n_redch, kernel_size=1))
             self.blocks.append(nn.BatchNorm2d(n_redch))
+            self.blocks.append(nn.ReLU(True))
             n_inpch = n_redch
         self.blocks.append(nn.Conv2d(n_inpch, n_otpch,
                 kernel_size=ksize, padding=(ksize // 2)))
         self.blocks.append(nn.BatchNorm2d(n_otpch))
+        self.blocks.append(nn.ReLU(True))
         for i, b in enumerate(self.blocks):
             self.add_module('B_' + str(i).zfill(3), b)
 
@@ -71,6 +76,7 @@ class InV1InPoolBlock(nn.Module):
         if n_redch:
             self.blocks.append(nn.Conv2d(n_inpch, n_redch, kernel_size=1))
             self.blocks.append(nn.BatchNorm2d(n_redch))
+            self.blocks.append(nn.ReLU(True))
         for i, b in enumerate(self.blocks):
             self.add_module('B_' + str(i).zfill(3), b)
 
@@ -81,7 +87,7 @@ class InV1InceptBlock(nn.Module):
             3: (n_redch3, n_otpch3),
             5: (n_redch5, n_otpch5),
             'm': n_redchm
-        }
+            }
     """
     def __init__(self, n_inpch, cfg, mp_cfg):
         super(InV1InceptBlock, self).__init__()
@@ -110,6 +116,9 @@ class InV1InceptBlock(nn.Module):
             self.add_module('B_002', self.blocks[1])
 
 class InV1ClfBlock(nn.Module):
+    """
+    cfg = 
+    """
     def __init__(self, n_inpch, n_otp, cfg):
         super(InV1ClfBlock, self).__init__()
         self.blocks = []
@@ -125,6 +134,7 @@ class InV1ClfBlock(nn.Module):
             self.blocks.append(nn.AdaptiveAvgPool2d((4, 4)))
             self.blocks.append(nn.Conv2d(n_inpch, 128, kernel_size=1))
             self.blocks.append(nn.BatchNorm2d(128))
+            self.blocks.append(nn.ReLU(True))
             self.blocks.append(nn.Flatten())
             self.blocks.append(nn.Linear(2048, 1024))
             self.blocks.append(nn.ReLU(True))

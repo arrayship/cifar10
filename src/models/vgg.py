@@ -1,6 +1,9 @@
 from torch import nn
 
 class VGGConvBlock(nn.Module):
+    """
+    cfg = [n_otpch1, n_otpch2, ...]
+    """
     def __init__(self, n_inpch, cfg, batch_norm=False):
         super(VGGConvBlock, self).__init__()
         self.blocks = []
@@ -12,10 +15,11 @@ class VGGConvBlock(nn.Module):
         return x
     
     def make_net(self, n_inpch, cfg, batch_norm):
-        for v in cfg:
-            self.blocks.append(nn.Conv2d(n_inpch, v, kernel_size=3, padding=1))
+        for n_otpch in cfg:
+            self.blocks.append(
+                    nn.Conv2d(n_inpch, n_otpch, kernel_size=3, padding=1))
             if batch_norm:
-                self.blocks.append(nn.BatchNorm2d(v))
+                self.blocks.append(nn.BatchNorm2d(n_otpch))
             self.blocks.append(nn.ReLU(inplace=True))
             n_inpch = cfg[- 1]
         self.blocks.append(nn.MaxPool2d(kernel_size=2, stride=2))
@@ -23,6 +27,10 @@ class VGGConvBlock(nn.Module):
             self.add_module('B_' + str(i).zfill(3), b)
 
 class VGGClfBlock(nn.Module):
+    """
+    n_inpch: number of input channels
+    n_otpch: number of output channels
+    """
     def __init__(self, n_inpch, n_otp):
         super(VGGClfBlock, self).__init__()
         self.blocks = []
