@@ -2,7 +2,7 @@
 
 Image classification implementation tested on Cifar-10 dataset.
 
-[Main.ipynb](notebooks/main.ipynb)
+[Main.ipynb](notebooks/Main.ipynb)
 
 ### Models
 - [VGG](src/models/vgg.py)
